@@ -111,12 +111,15 @@ class AppleAutocompleteService: AutocompleteService {
 class KeyboardViewController: KeyboardInputViewController {
 
     override func viewDidLoad() {
+        KeyboardSettings.store = .standard
+
         super.viewDidLoad()
 
-        // Set keyboard type to alphabetic
         state.keyboardContext.keyboardType = .alphabetic
 
-        // Setup autocomplete service
+        state.keyboardContext.settings.isAutocapitalizationEnabled = false
+        state.keyboardContext.autocapitalizationTypeOverride = Keyboard.AutocapitalizationType.none
+
         services.autocompleteService = AppleAutocompleteService(language: "en_US")
     }
 
