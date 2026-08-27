@@ -6,8 +6,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/KeyboardKit/KeyboardKit.git",
       "state" : {
-        "revision" : "588583a8f38b6f92cebe334def8ad6411be8333c",
-        "version" : "10.1.4"
+        "revision" : "9e175b5d92a51d58d10f6f3ba3a42700fda728a4",
+        "version" : "10.9.0"
+      }
+    },
+    {
+      "identity" : "licensekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/LicenseKit/LicenseKit.git",
+      "state" : {
+        "revision" : "f9bdcdc3472918c6da7566940a12936374f0faee",
+        "version" : "2.1.3"
       }
     }
   ],
