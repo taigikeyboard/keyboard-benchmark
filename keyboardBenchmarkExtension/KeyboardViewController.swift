@@ -54,6 +54,13 @@ class KeyboardViewController: KeyboardInputViewController {
     /// Change this line and reinstall the extension to run a different variant.
     private let testVariant: AutocapitalizationTestVariant = .settingOffOverrideExplicitNone
 
+    /// Forces `keyboardCase` to `.lowercased` right before KeyboardKit's initial-case hook runs.
+    ///
+    /// Separates "the initial-case logic computes `uppercased`" from "nothing ever writes
+    /// `keyboardCase`, so it keeps its default". If `didSetup` still reports `lowercased`, super
+    /// left the value alone and a single forced write is a complete workaround.
+    private let forcesLowercasedInitialCase = true
+
     private let trace = AutocapitalizationTrace()
 
     /// Applies the variant in the setup completion's success branch, matching the official demo
@@ -87,8 +94,19 @@ class KeyboardViewController: KeyboardInputViewController {
     override func viewWillSetupInitialKeyboardCase() {
         logCaseState(event: "keyboard.initialCase.beforeApply")
         applyTestVariant(event: "keyboard.initialCase.applied")
+        if forcesLowercasedInitialCase {
+            state.keyboardContext.keyboardCase = .lowercased
+            logCaseState(event: "keyboard.initialCase.forcedLowercase")
+        }
         super.viewWillSetupInitialKeyboardCase()
         logCaseState(event: "keyboard.initialCase.didSetup")
+    }
+
+    /// Catches a writer that runs after the initial-case hook — the case seen on screen is the
+    /// one standing here, not the one `didSetup` reported.
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logCaseState(event: "keyboard.viewDidAppear")
     }
 
     override func viewWillSetupKeyboardView() {
