@@ -52,7 +52,7 @@ enum AutocapitalizationTestVariant {
 class KeyboardViewController: KeyboardInputViewController {
 
     /// Change this line and reinstall the extension to run a different variant.
-    private let testVariant: AutocapitalizationTestVariant = .settingOffOverrideNone
+    private let testVariant: AutocapitalizationTestVariant = .settingOffOverrideExplicitNone
 
     private let trace = AutocapitalizationTrace()
 
