@@ -25,25 +25,25 @@ private struct AutocapitalizationTestField: Identifiable {
 
     static let all: [AutocapitalizationTestField] = [
         .init(
-            title: ".sentences",
+            title: "句首大寫(.sentences)",
             capitalization: .sentences,
             expectedSettingOnOverrideNil: "Ab cd. Ef",
             expectedSettingOffOverrideNil: "ab cd. ef"
         ),
         .init(
-            title: ".never",
+            title: "永不大寫(.never)",
             capitalization: .never,
             expectedSettingOnOverrideNil: "ab cd. ef",
             expectedSettingOffOverrideNil: "ab cd. ef"
         ),
         .init(
-            title: ".words",
+            title: "每個字大寫(.words)",
             capitalization: .words,
             expectedSettingOnOverrideNil: "Ab Cd. Ef",
             expectedSettingOffOverrideNil: "ab cd. ef"
         ),
         .init(
-            title: ".characters",
+            title: "全部大寫(.characters)",
             capitalization: .characters,
             expectedSettingOnOverrideNil: "AB CD. EF",
             expectedSettingOffOverrideNil: "ab cd. ef"
@@ -62,13 +62,15 @@ struct ContentView: View {
         NavigationStack {
             Form {
                 Section("測試步驟") {
-                    Text("依序敲:a、b、空白、c、d、句點、空白、e、f — 全程不要碰 Shift。")
+                    Text("四個欄位敲的鍵完全一樣,只有該出現的字不同。")
+                    Text("每個欄位都敲這九個鍵:a、b、空白、c、d、句點、空白、e、f")
+                    Text("全程不要碰 Shift。")
                     Text("鍵盤跳出來的第一幀就要看 Shift 鍵狀態,打字之前先看。")
                     Text("每次判定首字大小寫都要在空欄位重新開一次鍵盤。先按重設 — 鍵盤還開著就直接切欄位,測不到首次呈現。")
                 }
                 ForEach(AutocapitalizationTestField.all) { field in
                     Section(field.title) {
-                        TextField(field.title, text: binding(for: field))
+                        TextField("敲 a b 空白 c d 句點 空白 e f", text: binding(for: field))
                             .textInputAutocapitalization(field.capitalization)
                             .autocorrectionDisabled()
                             .keyboardType(.default)
