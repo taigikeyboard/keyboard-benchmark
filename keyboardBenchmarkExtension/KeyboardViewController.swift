@@ -10,13 +10,6 @@ import OSLog
 import SwiftUI
 import UIKit
 
-extension KeyboardApp {
-
-    static var benchmark: KeyboardApp {
-        .init(name: "Keyboard Benchmark")
-    }
-}
-
 /// The autocapitalization configuration under test, applied on every launch.
 ///
 /// `isAutocapitalizationEnabled` is `@AppStorage`-backed, so a value written once stays in
