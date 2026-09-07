@@ -62,24 +62,29 @@ class KeyboardViewController: KeyboardInputViewController {
         setupKeyboardKit(for: .benchmark) { [weak self] result in
             switch result {
             case .success:
-                self?.applyTestVariant()
+                self?.applyTestVariant(event: "keyboard.setup.complete")
             case .failure(let error):
                 Self.logger.error("keyboard.setup.failed error=\(String(describing: error), privacy: .public)")
             }
         }
     }
 
-    private func applyTestVariant() {
+    private func applyTestVariant(event: String) {
         state.keyboardContext.settings.isAutocapitalizationEnabled = testVariant.isAutocapitalizationEnabled
         state.keyboardContext.autocapitalizationTypeOverride = testVariant.autocapitalizationTypeOverride
-        logCaseState(event: "keyboard.setup.complete")
+        logCaseState(event: event)
     }
 
-    /// Logs whether the configuration written in `viewWillSetupKeyboardKit` is already visible
-    /// when KeyboardKit computes the initial case. If it is not, the assignment lands too late
-    /// to affect the first keyboard presentation — the exact symptom issue #1057 describes.
+    /// Reapplies the variant immediately before KeyboardKit computes the initial case.
+    ///
+    /// The setup completion runs asynchronously, so on 10.9.3 the assignment there can land after
+    /// this hook — too late to affect the first keyboard presentation, which is the exact symptom
+    /// issue #1057 describes. Writing here removes that timing question: if the first character
+    /// still comes out uppercased, KeyboardKit's initial-case logic is ignoring the setting rather
+    /// than reading it before we set it.
     override func viewWillSetupInitialKeyboardCase() {
-        logCaseState(event: "keyboard.initialCase.willSetup")
+        logCaseState(event: "keyboard.initialCase.beforeApply")
+        applyTestVariant(event: "keyboard.initialCase.applied")
         super.viewWillSetupInitialKeyboardCase()
         logCaseState(event: "keyboard.initialCase.didSetup")
     }
@@ -107,6 +112,7 @@ class KeyboardViewController: KeyboardInputViewController {
             isAutocapitalizationEnabled=\(context.settings.isAutocapitalizationEnabled, privacy: .public) \
             autocapitalizationTypeOverride=\(String(describing: context.autocapitalizationTypeOverride), privacy: .public) \
             keyboardCase=\(context.keyboardCase.rawValue, privacy: .public) \
+            storeKeyPrefix=\(KeyboardSettings.storeKeyPrefix, privacy: .public) \
             proxyAutocapitalizationType=\(String(describing: self.textDocumentProxy.autocapitalizationType?.rawValue), privacy: .public)
             """)
     }
