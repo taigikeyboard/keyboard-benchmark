@@ -61,8 +61,22 @@ class KeyboardViewController: KeyboardInputViewController {
     /// Change this line and reinstall the extension to run a different variant.
     private let testVariant: AutocapitalizationTestVariant = .settingOffOverrideNone
 
+    /// Applies the variant in the setup completion's success branch, matching the official demo
+    /// at `Demo/Keyboard/KeyboardViewController.swift`. `setupKeyboardKit(for:)` completes
+    /// asynchronously, so writing state right after the call can be overwritten by the rest of
+    /// setup — that would read as a KeyboardKit failure when it is a test-bed failure.
     override func viewWillSetupKeyboardKit() {
-        setupKeyboardKit(for: .benchmark)
+        setupKeyboardKit(for: .benchmark) { [weak self] result in
+            switch result {
+            case .success:
+                self?.applyTestVariant()
+            case .failure(let error):
+                Self.logger.error("keyboard.setup.failed error=\(String(describing: error), privacy: .public)")
+            }
+        }
+    }
+
+    private func applyTestVariant() {
         state.keyboardContext.settings.isAutocapitalizationEnabled = testVariant.isAutocapitalizationEnabled
         state.keyboardContext.autocapitalizationTypeOverride = testVariant.autocapitalizationTypeOverride
         logCaseState(event: "keyboard.setup.complete")
