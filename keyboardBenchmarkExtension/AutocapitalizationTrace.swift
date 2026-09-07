@@ -27,23 +27,34 @@ final class AutocapitalizationTrace: ObservableObject {
     }
 }
 
-/// Renders the trace as a scrollable strip where the keyboard's autocomplete toolbar would be.
+/// Renders the trace as a scrollable strip where the keyboard's autocomplete toolbar would be,
+/// with a button that types the whole trace into the focused field so it can be copied out.
 struct AutocapitalizationTraceToolbar: View {
 
     @ObservedObject var trace: AutocapitalizationTrace
 
+    /// Types the joined trace into the document, for a tester who cannot select text on the
+    /// keyboard itself. Run it only after reading the case result — it changes the field's text.
+    let onDump: (String) -> Void
+
     var body: some View {
-        ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(Array(trace.lines.enumerated()), id: \.offset) { _, line in
-                    Text(line)
-                        .font(.system(size: 9, design: .monospaced))
-                        .textSelection(.enabled)
+        HStack(alignment: .top, spacing: 4) {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(Array(trace.lines.enumerated()), id: \.offset) { _, line in
+                        Text(line)
+                            .font(.system(size: 10, design: .monospaced))
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 6)
+            Button("輸出") {
+                onDump(trace.lines.joined(separator: "\n"))
+            }
+            .font(.system(size: 11))
+            .buttonStyle(.bordered)
         }
-        .frame(height: 64)
+        .padding(.horizontal, 6)
+        .frame(height: 72)
     }
 }

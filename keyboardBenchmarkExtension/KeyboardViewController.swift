@@ -95,13 +95,18 @@ class KeyboardViewController: KeyboardInputViewController {
         // Capture the trace, not `self` — the view outlives the setup call.
         let trace = trace
         setupKeyboardView { controller in
-            KeyboardView(
+            let insertTrace: (String) -> Void = { [weak controller] text in
+                controller?.textDocumentProxy.insertText("\n" + text)
+            }
+            return KeyboardView(
                 services: controller.services,
                 buttonContent: { $0.view },
                 buttonView: { $0.view },
                 collapsedView: { $0.view },
                 emojiKeyboard: { $0.view },
-                toolbar: { _ in AutocapitalizationTraceToolbar(trace: trace) }
+                toolbar: { _ in
+                    AutocapitalizationTraceToolbar(trace: trace, onDump: insertTrace)
+                }
             )
         }
     }
