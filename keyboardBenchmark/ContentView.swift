@@ -61,10 +61,10 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Instructions") {
-                    Text("Type: a, b, space, c, d, period, space, e, f — never touch Shift.")
-                    Text("Check the Shift key state on the very first frame after the keyboard opens, before typing.")
-                    Text("Each initial-case assertion needs a freshly opened keyboard on an empty field. Reset first — switching fields with the keyboard still up does not retest the first presentation.")
+                Section("測試步驟") {
+                    Text("依序敲:a、b、空白、c、d、句點、空白、e、f — 全程不要碰 Shift。")
+                    Text("鍵盤跳出來的第一幀就要看 Shift 鍵狀態,打字之前先看。")
+                    Text("每次判定首字大小寫都要在空欄位重新開一次鍵盤。先按重設 — 鍵盤還開著就直接切欄位,測不到首次呈現。")
                 }
                 ForEach(AutocapitalizationTestField.all) { field in
                     Section(field.title) {
@@ -73,22 +73,22 @@ struct ContentView: View {
                             .autocorrectionDisabled()
                             .keyboardType(.default)
                             .focused($focusedField, equals: field.id)
-                        LabeledContent("Setting on, override nil", value: field.expectedSettingOnOverrideNil)
-                        LabeledContent("Setting off, override nil", value: field.expectedSettingOffOverrideNil)
+                        LabeledContent("設定開、override nil", value: field.expectedSettingOnOverrideNil)
+                        LabeledContent("設定關、override nil", value: field.expectedSettingOffOverrideNil)
                         LabeledContent(
-                            "Override .none, either setting",
+                            "override .none,設定開關皆同",
                             value: AutocapitalizationTestField.expectedWithExplicitNoneOverride
                         )
                     }
                 }
                 Section {
-                    Button("Reset: clear text and dismiss keyboard") {
+                    Button("重設:清空文字並收起鍵盤") {
                         enteredText.removeAll()
                         focusedField = nil
                     }
                 }
             }
-            .navigationTitle("Autocapitalization")
+            .navigationTitle("自動大寫測試")
         }
     }
 
