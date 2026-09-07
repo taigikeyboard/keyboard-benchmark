@@ -54,6 +54,8 @@ class KeyboardViewController: KeyboardInputViewController {
     /// Change this line and reinstall the extension to run a different variant.
     private let testVariant: AutocapitalizationTestVariant = .settingOffOverrideNone
 
+    private let trace = AutocapitalizationTrace()
+
     /// Applies the variant in the setup completion's success branch, matching the official demo
     /// at `Demo/Keyboard/KeyboardViewController.swift`. `setupKeyboardKit(for:)` completes
     /// asynchronously, so writing state right after the call can be overwritten by the rest of
@@ -90,6 +92,8 @@ class KeyboardViewController: KeyboardInputViewController {
     }
 
     override func viewWillSetupKeyboardView() {
+        // Capture the trace, not `self` — the view outlives the setup call.
+        let trace = trace
         setupKeyboardView { controller in
             KeyboardView(
                 services: controller.services,
@@ -97,7 +101,7 @@ class KeyboardViewController: KeyboardInputViewController {
                 buttonView: { $0.view },
                 collapsedView: { $0.view },
                 emojiKeyboard: { $0.view },
-                toolbar: { $0.view }
+                toolbar: { _ in AutocapitalizationTraceToolbar(trace: trace) }
             )
         }
     }
@@ -106,6 +110,14 @@ class KeyboardViewController: KeyboardInputViewController {
     /// Xcode to the extension process before it launches.
     private func logCaseState(event: String) {
         let context = state.keyboardContext
+        trace.record("""
+            \(event) \
+            autocap=\(context.settings.isAutocapitalizationEnabled) \
+            override=\(String(describing: context.autocapitalizationTypeOverride)) \
+            case=\(context.keyboardCase.rawValue) \
+            prefix=\(KeyboardSettings.storeKeyPrefix) \
+            proxyType=\(String(describing: textDocumentProxy.autocapitalizationType?.rawValue))
+            """)
         Self.logger.notice("""
             \(event, privacy: .public) \
             variant=\(String(describing: self.testVariant), privacy: .public) \
